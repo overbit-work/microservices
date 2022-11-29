@@ -1,6 +1,6 @@
 {
-  "short_name": "Sample service",
-  "name": "Sample service",
+  "short_name": "service b",
+  "name": "service b",
   "icons": [
     {
       "src": "favicon.ico",
