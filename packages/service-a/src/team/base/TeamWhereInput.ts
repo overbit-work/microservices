@@ -15,9 +15,9 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
-import { TeamListRelationFilter } from "../../team/base/TeamListRelationFilter";
+import { UserWhereUniqueInput } from "../../user/base/UserWhereUniqueInput";
 @InputType()
-class UserWhereInput {
+class TeamWhereInput {
   @ApiProperty({
     required: false,
     type: StringNullableFilter,
@@ -27,7 +27,7 @@ class UserWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  firstName?: StringNullableFilter;
+  department?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -42,29 +42,6 @@ class UserWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  lastName?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => TeamListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => TeamListRelationFilter)
-  @IsOptional()
-  @Field(() => TeamListRelationFilter, {
-    nullable: true,
-  })
-  teams?: TeamListRelationFilter;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -72,6 +49,18 @@ class UserWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  username?: StringFilter;
+  name?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UserWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UserWhereUniqueInput, {
+    nullable: true,
+  })
+  user?: UserWhereUniqueInput;
 }
-export { UserWhereInput };
+export { TeamWhereInput };

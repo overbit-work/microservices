@@ -11,19 +11,11 @@ https://docs.amplication.com/docs/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsDate,
-  IsString,
-  IsOptional,
-  IsJSON,
-  ValidateNested,
-} from "class-validator";
+import { IsDate, IsString, IsOptional, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { GraphQLJSON } from "graphql-type-json";
-import { JsonValue } from "type-fest";
-import { Team } from "../../team/base/Team";
+import { User } from "../../user/base/User";
 @ObjectType()
-class User {
+class Team {
   @ApiProperty({
     required: true,
   })
@@ -41,7 +33,7 @@ class User {
   @Field(() => String, {
     nullable: true,
   })
-  firstName!: string | null;
+  department!: string | null;
 
   @ApiProperty({
     required: true,
@@ -52,31 +44,12 @@ class User {
   id!: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: String,
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  lastName!: string | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsJSON()
-  @Field(() => GraphQLJSON)
-  roles!: JsonValue;
-
-  @ApiProperty({
-    required: false,
-    type: () => [Team],
-  })
-  @ValidateNested()
-  @Type(() => Team)
-  @IsOptional()
-  teams?: Array<Team>;
+  @Field(() => String)
+  name!: string;
 
   @ApiProperty({
     required: true,
@@ -87,11 +60,12 @@ class User {
   updatedAt!: Date;
 
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: () => User,
   })
-  @IsString()
-  @Field(() => String)
-  username!: string;
+  @ValidateNested()
+  @Type(() => User)
+  @IsOptional()
+  user?: User | null;
 }
-export { User };
+export { Team };
