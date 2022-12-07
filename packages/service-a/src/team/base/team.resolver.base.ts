@@ -19,32 +19,31 @@ import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { CreateUserArgs } from "./CreateUserArgs";
-import { UpdateUserArgs } from "./UpdateUserArgs";
-import { DeleteUserArgs } from "./DeleteUserArgs";
-import { UserFindManyArgs } from "./UserFindManyArgs";
-import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
-import { User } from "./User";
-import { TeamFindManyArgs } from "../../team/base/TeamFindManyArgs";
-import { Team } from "../../team/base/Team";
-import { UserService } from "../user.service";
+import { CreateTeamArgs } from "./CreateTeamArgs";
+import { UpdateTeamArgs } from "./UpdateTeamArgs";
+import { DeleteTeamArgs } from "./DeleteTeamArgs";
+import { TeamFindManyArgs } from "./TeamFindManyArgs";
+import { TeamFindUniqueArgs } from "./TeamFindUniqueArgs";
+import { Team } from "./Team";
+import { User } from "../../user/base/User";
+import { TeamService } from "../team.service";
 
-@graphql.Resolver(() => User)
+@graphql.Resolver(() => Team)
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
-export class UserResolverBase {
+export class TeamResolverBase {
   constructor(
-    protected readonly service: UserService,
+    protected readonly service: TeamService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "read",
     possession: "any",
   })
-  async _usersMeta(
-    @graphql.Args() args: UserFindManyArgs
+  async _teamsMeta(
+    @graphql.Args() args: TeamFindManyArgs
   ): Promise<MetaQueryPayload> {
     const results = await this.service.count({
       ...args,
@@ -57,24 +56,24 @@ export class UserResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => [User])
+  @graphql.Query(() => [Team])
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "read",
     possession: "any",
   })
-  async users(@graphql.Args() args: UserFindManyArgs): Promise<User[]> {
+  async teams(@graphql.Args() args: TeamFindManyArgs): Promise<Team[]> {
     return this.service.findMany(args);
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => User, { nullable: true })
+  @graphql.Query(() => Team, { nullable: true })
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "read",
     possession: "own",
   })
-  async user(@graphql.Args() args: UserFindUniqueArgs): Promise<User | null> {
+  async team(@graphql.Args() args: TeamFindUniqueArgs): Promise<Team | null> {
     const result = await this.service.findOne(args);
     if (result === null) {
       return null;
@@ -83,31 +82,47 @@ export class UserResolverBase {
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => User)
+  @graphql.Mutation(() => Team)
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "create",
     possession: "any",
   })
-  async createUser(@graphql.Args() args: CreateUserArgs): Promise<User> {
+  async createTeam(@graphql.Args() args: CreateTeamArgs): Promise<Team> {
     return await this.service.create({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        user: args.data.user
+          ? {
+              connect: args.data.user,
+            }
+          : undefined,
+      },
     });
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => User)
+  @graphql.Mutation(() => Team)
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "update",
     possession: "any",
   })
-  async updateUser(@graphql.Args() args: UpdateUserArgs): Promise<User | null> {
+  async updateTeam(@graphql.Args() args: UpdateTeamArgs): Promise<Team | null> {
     try {
       return await this.service.update({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          user: args.data.user
+            ? {
+                connect: args.data.user,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -119,13 +134,13 @@ export class UserResolverBase {
     }
   }
 
-  @graphql.Mutation(() => User)
+  @graphql.Mutation(() => Team)
   @nestAccessControl.UseRoles({
-    resource: "User",
+    resource: "Team",
     action: "delete",
     possession: "any",
   })
-  async deleteUser(@graphql.Args() args: DeleteUserArgs): Promise<User | null> {
+  async deleteTeam(@graphql.Args() args: DeleteTeamArgs): Promise<Team | null> {
     try {
       return await this.service.delete(args);
     } catch (error) {
@@ -139,22 +154,18 @@ export class UserResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [Team])
+  @graphql.ResolveField(() => User, { nullable: true })
   @nestAccessControl.UseRoles({
-    resource: "Team",
+    resource: "User",
     action: "read",
     possession: "any",
   })
-  async teams(
-    @graphql.Parent() parent: User,
-    @graphql.Args() args: TeamFindManyArgs
-  ): Promise<Team[]> {
-    const results = await this.service.findTeams(parent.id, args);
+  async user(@graphql.Parent() parent: Team): Promise<User | null> {
+    const result = await this.service.getUser(parent.id);
 
-    if (!results) {
-      return [];
+    if (!result) {
+      return null;
     }
-
-    return results;
+    return result;
   }
 }

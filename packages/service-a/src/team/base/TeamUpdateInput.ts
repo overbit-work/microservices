@@ -11,13 +11,11 @@ https://docs.amplication.com/docs/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsJSON, ValidateNested } from "class-validator";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
-import { TeamCreateNestedManyWithoutUsersInput } from "./TeamCreateNestedManyWithoutUsersInput";
+import { IsString, IsOptional, ValidateNested } from "class-validator";
+import { UserWhereUniqueInput } from "../../user/base/UserWhereUniqueInput";
 import { Type } from "class-transformer";
 @InputType()
-class UserCreateInput {
+class TeamUpdateInput {
   @ApiProperty({
     required: false,
     type: String,
@@ -27,7 +25,7 @@ class UserCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  firstName?: string | null;
+  department?: string | null;
 
   @ApiProperty({
     required: false,
@@ -38,41 +36,18 @@ class UserCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  lastName?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  password!: string;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsJSON()
-  @Field(() => GraphQLJSON)
-  roles!: InputJsonValue;
+  name?: string;
 
   @ApiProperty({
     required: false,
-    type: () => TeamCreateNestedManyWithoutUsersInput,
+    type: () => UserWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => TeamCreateNestedManyWithoutUsersInput)
+  @Type(() => UserWhereUniqueInput)
   @IsOptional()
-  @Field(() => TeamCreateNestedManyWithoutUsersInput, {
+  @Field(() => UserWhereUniqueInput, {
     nullable: true,
   })
-  teams?: TeamCreateNestedManyWithoutUsersInput;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  username!: string;
+  user?: UserWhereUniqueInput | null;
 }
-export { UserCreateInput };
+export { TeamUpdateInput };
