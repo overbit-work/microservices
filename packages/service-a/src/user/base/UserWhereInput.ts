@@ -13,8 +13,9 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
+import { TeamListRelationFilter } from "../../team/base/TeamListRelationFilter";
 @InputType()
 class UserWhereInput {
   @ApiProperty({
@@ -49,6 +50,18 @@ class UserWhereInput {
     nullable: true,
   })
   lastName?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => TeamListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => TeamListRelationFilter)
+  @IsOptional()
+  @Field(() => TeamListRelationFilter, {
+    nullable: true,
+  })
+  teams?: TeamListRelationFilter;
 
   @ApiProperty({
     required: false,
