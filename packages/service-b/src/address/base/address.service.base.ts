@@ -52,7 +52,7 @@ export class AddressServiceBase {
     args: Prisma.CustomerFindManyArgs
   ): Promise<Customer[]> {
     return this.prisma.address
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: parentId },
       })
       .customers(args);

@@ -52,7 +52,7 @@ export class CustomerServiceBase {
     args: Prisma.OrderFindManyArgs
   ): Promise<Order[]> {
     return this.prisma.customer
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: parentId },
       })
       .orders(args);
