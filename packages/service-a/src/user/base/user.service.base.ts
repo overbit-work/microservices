@@ -77,7 +77,7 @@ export class UserServiceBase {
     args: Prisma.TeamFindManyArgs
   ): Promise<Team[]> {
     return this.prisma.user
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: parentId },
       })
       .teams(args);
